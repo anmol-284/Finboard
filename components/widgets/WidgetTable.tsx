@@ -6,13 +6,18 @@ import useDashboardStore from '@/store/dashboardStore';
 import { fetchApiData, getNestedValue, flattenObject } from '@/utils/api';
 import { Widget } from '@/types/widget';
 import { format } from 'date-fns';
-import WidgetConfigModal from '../WidgetConfigModal';
+import dynamic from 'next/dynamic';
+
+// Lazy load modal
+const WidgetConfigModal = dynamic(() => import('../WidgetConfigModal'), {
+  ssr: false,
+});
 
 interface WidgetTableProps {
   widget: Widget;
 }
 
-export default function WidgetTable({ widget }: WidgetTableProps) {
+function WidgetTable({ widget }: WidgetTableProps) {
   const updateWidget = useDashboardStore((state) => state.updateWidget);
   const removeWidget = useDashboardStore((state) => state.removeWidget);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -411,3 +416,5 @@ export default function WidgetTable({ widget }: WidgetTableProps) {
     </div>
   );
 }
+
+export default WidgetTable;

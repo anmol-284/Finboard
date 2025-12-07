@@ -13,7 +13,7 @@ interface WidgetChartProps {
   widget: Widget;
 }
 
-export default function WidgetChart({ widget }: WidgetChartProps) {
+function WidgetChart({ widget }: WidgetChartProps) {
   const updateWidget = useDashboardStore((state) => state.updateWidget);
   const removeWidget = useDashboardStore((state) => state.removeWidget);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -372,3 +372,5 @@ export default function WidgetChart({ widget }: WidgetChartProps) {
     </div>
   );
 }
+
+export default WidgetChart;
