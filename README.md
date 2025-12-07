@@ -155,31 +155,9 @@ NEXT_PUBLIC_API_KEY=your_key_here
 
 **Note**: For production, use Next.js API routes to securely handle API keys on the server side.
 
-## CORS Issues
-
-If you encounter CORS errors when fetching from APIs:
-
-1. **Development**: Use a CORS proxy or browser extension
-2. **Production**: Create Next.js API routes to proxy requests server-side
-
-Example API route:
-```typescript
-// app/api/proxy/route.ts
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const apiUrl = searchParams.get('url');
-  
-  const response = await fetch(apiUrl!);
-  const data = await response.json();
-  
-  return Response.json(data);
-}
-```
 
 ## Features Roadmap
 
-- [ ] Real-time WebSocket support
-- [ ] Dashboard templates
 - [ ] Export/import dashboard configurations
 - [ ] Widget templates
 - [ ] Custom date ranges for charts
@@ -189,10 +167,6 @@ export async function GET(request: Request) {
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-MIT License
 
 ## Support
 
