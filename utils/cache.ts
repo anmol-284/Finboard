@@ -205,7 +205,7 @@ class ApiCache {
   /**
    * Cleanup expired entries
    */
-  cleanup(): void {
+  cleanup(): number {
     const now = Date.now();
     let cleaned = 0;
 

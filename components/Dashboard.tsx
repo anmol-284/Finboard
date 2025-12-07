@@ -10,7 +10,7 @@ import WidgetTable from './widgets/WidgetTable';
 import WidgetChart from './widgets/WidgetChart';
 import AddWidgetModal from './AddWidgetModal';
 import ThemeToggle from './ThemeToggle';
-import { BarChart3, Plus } from 'lucide-react';
+import { BarChart3, Plus, Download, Upload } from 'lucide-react';
 import { Widget } from '@/types/widget';
 
 interface SortableWidgetProps {
@@ -67,6 +67,8 @@ export default function Dashboard() {
   const widgets = useDashboardStore((state) => state.widgets);
   const theme = useDashboardStore((state) => state.theme);
   const reorderWidgets = useDashboardStore((state) => state.reorderWidgets);
+  const exportConfig = useDashboardStore((state) => state.exportConfig);
+  const importConfig = useDashboardStore((state) => state.importConfig);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -94,6 +96,54 @@ export default function Dashboard() {
     }
   };
 
+  const handleExport = () => {
+    if (widgets.length === 0) {
+      alert('No widgets to export. Add some widgets first!');
+      return;
+    }
+    exportConfig();
+  };
+
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const text = event.target?.result as string;
+          const config = JSON.parse(text);
+
+          // Check if it's a valid dashboard config
+          if (!config.widgets || !Array.isArray(config.widgets)) {
+            alert('Invalid configuration file. Please select a valid dashboard export file.');
+            return;
+          }
+
+          // Confirm before importing (will replace current dashboard)
+          const confirmMessage = `This will replace your current dashboard with ${config.widgets.length} widget(s). Continue?`;
+          if (confirm(confirmMessage)) {
+            const success = importConfig(config);
+            if (success) {
+              alert(`Successfully imported ${config.widgets.length} widget(s)!`);
+            } else {
+              alert('Failed to import configuration. Please check the file format.');
+            }
+          }
+        } catch (error) {
+          alert('Error reading file. Please make sure it\'s a valid JSON file.');
+          console.error('Import error:', error);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
   return (
     <div className={`min-h-screen transition-colors ${
       theme === 'dark' 
@@ -118,8 +168,24 @@ export default function Dashboard() {
               )}
             </p>
           </div>
-          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto flex-wrap">
             <ThemeToggle />
+            <button
+              onClick={handleExport}
+              className="flex items-center justify-center gap-1.5 sm:gap-2 bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors font-medium text-sm sm:text-base"
+              title="Export dashboard configuration"
+            >
+              <Download size={16} className="sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Export</span>
+            </button>
+            <button
+              onClick={handleImport}
+              className="flex items-center justify-center gap-1.5 sm:gap-2 bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors font-medium text-sm sm:text-base"
+              title="Import dashboard configuration"
+            >
+              <Upload size={16} className="sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Import</span>
+            </button>
             <button
               onClick={() => setIsAddModalOpen(true)}
               className="flex items-center justify-center gap-1.5 sm:gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg transition-colors font-medium shadow-lg shadow-blue-600/20 text-sm sm:text-base flex-1 sm:flex-none"
