@@ -4,6 +4,8 @@ const nextConfig = {
   images: {
     domains: [],
   },
+  // Optimize production builds
+  swcMinify: true,
 };
 
 module.exports = nextConfig;
